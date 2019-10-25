@@ -70,7 +70,7 @@ void Overlay::MainLoop() {
 
 	//Loop through first 12 entities
 	//Feel free to add an actual entity count
-	for (int i = 1/*0 is local player in situations and lw htunt, set to 0 if playing mp*/; i < 32; i++) {
+	for (int i = 1/*0 is local player in situations and lw htunt, set to 0 if playing mp*/; i < 12; i++) {
 
 		//Get the current entity
 		DWORD_PTR Entity = Mem.GetEntity(i);
