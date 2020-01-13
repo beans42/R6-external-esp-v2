@@ -1,8 +1,8 @@
 #pragma once
 
 // Game ->
-#define ADDRESS_GAMEMANAGER 0x5306348
-#define ADDRESS_GAMERENDERER 0x52f5bd8
+#define ADDRESS_GAMEMANAGER 0x52befd8
+#define ADDRESS_GAMERENDERER 0x52ae868
 
 // Game -> GameRenderer ->
 #define OFFSET_GAMERENDERER_DEREF 0x68
