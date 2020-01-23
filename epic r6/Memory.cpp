@@ -4,6 +4,7 @@
 #include "Globals.h"
 #include "Offsets.h"
 #include <cmath>
+#include <iostream>
 
 Memory::Memory() {};
 
@@ -32,8 +33,8 @@ BOOL Memory::SetBaseAddress() {
 	return false;
 }
 
-DWORD_PTR Memory::GetBaseAddress() {
-	return (DWORD_PTR)BaseAddress;
+uintptr_t Memory::GetBaseAddress() {
+	return (uintptr_t)BaseAddress;
 }
 
 template<typename T> T Memory::RPM(SIZE_T address) {
@@ -56,34 +57,33 @@ template<typename T> void Memory::WPM(SIZE_T address, T buffer) {
 }
 
 void Memory::UpdateAddresses() {
-	pGameManager = RPM<DWORD_PTR>(GetBaseAddress() + ADDRESS_GAMEMANAGER);
-	pEntityList = RPM<DWORD_PTR>(pGameManager + OFFSET_GAMEMANAGER_ENTITYLIST);
-	pRender = RPM<DWORD_PTR>(GetBaseAddress() + ADDRESS_GAMERENDERER);
-	pGameRender = RPM<DWORD_PTR>(pRender + OFFSET_GAMERENDERER_DEREF);
-	pEngineLink = RPM<DWORD_PTR>(pGameRender + OFFSET_GAMERENDERER_ENGINELINK);
-	pEngine = RPM<DWORD_PTR>(pEngineLink + OFFSET_ENGINELINK_ENGINE);
-	pCamera = RPM<DWORD_PTR>(pEngine + OFFSET_ENGINE_CAMERA);
+	pGameManager = RPM<uintptr_t>(GetBaseAddress() + ADDRESS_GAMEMANAGER);
+	pEntityList = RPM<uintptr_t>(pGameManager + OFFSET_GAMEMANAGER_ENTITYLIST);
+	pCamera = RPM<uintptr_t>(GetBaseAddress() + ADDRESS_GAMEPROFILE);
+
+	pCamera = RPM<uintptr_t>(pCamera + GAMEPROFILE_CHAIN1);
+	pCamera = RPM<uintptr_t>(pCamera + GAMEPROFILE_CHAIN2);
+	pCamera = RPM<uintptr_t>(pCamera + GAMEPROFILE_CHAIN3);
 }
 
-DWORD_PTR Memory::GetEntity(int i) {
-	DWORD_PTR entityBase = RPM<DWORD_PTR>(pEntityList + (i * OFFSET_GAMEMANAGER_ENTITY));
-	return RPM<DWORD_PTR>(entityBase + 0x20);
+uintptr_t Memory::GetEntity(int i) {
+	uintptr_t entityBase = RPM<uintptr_t>(pEntityList + (i * OFFSET_GAMEMANAGER_ENTITY));
+	return RPM<uintptr_t>(entityBase + 0x20);
 }
 
-DWORD_PTR Memory::GetEntity2(int i) 
-{
-	DWORD_PTR entityBase = RPM<DWORD_PTR>(pEntityList + (i * OFFSET_GAMEMANAGER_ENTITY));
+uintptr_t Memory::GetEntity2(int i) {
+	uintptr_t entityBase = RPM<uintptr_t>(pEntityList + (i * OFFSET_GAMEMANAGER_ENTITY));
 	return entityBase;
 }
 
-float Memory::GetEntityHealth(DWORD_PTR entity) 
+float Memory::GetEntityHealth(uintptr_t entity) 
 {
 	//Entity info pointer from the Entity
-	DWORD_PTR EntityInfo = RPM<DWORD_PTR>(entity + OFFSET_ENTITY_ENTITYINFO);
+	uintptr_t EntityInfo = RPM<uintptr_t>(entity + OFFSET_ENTITY_ENTITYINFO);
 	//Main component pointer from the entity info
-	DWORD_PTR MainComponent = RPM<DWORD_PTR>(EntityInfo + OFFSET_ENTITYINFO_MAINCOMPONENT);
+	uintptr_t MainComponent = RPM<uintptr_t>(EntityInfo + OFFSET_ENTITYINFO_MAINCOMPONENT);
 	//Child component pointer form the main component
-	DWORD_PTR ChildComponent = RPM<DWORD_PTR>(MainComponent + OFFSET_MAINCOMPONENT_CHILDCOMPONENT);
+	uintptr_t ChildComponent = RPM<uintptr_t>(MainComponent + OFFSET_MAINCOMPONENT_CHILDCOMPONENT);
 
 	//Finally health from the child component
 	float kek = RPM<float>(ChildComponent + OFFSET_CHILDCOMPONENT_HEALTH_FLOAT);
@@ -92,42 +92,42 @@ float Memory::GetEntityHealth(DWORD_PTR entity)
 	return kek;
 }
 
-Vector3 Memory::GetEntityFeetPosition(DWORD_PTR entity) {
+Vector3 Memory::GetEntityFeetPosition(uintptr_t entity) {
 	//We get the feet position straight from the entity
 	return RPM<Vector3>(entity + OFFSET_ENTITY_FEET);
 }
 
-Vector3 Memory::GetEntityHeadPosition(DWORD_PTR entity) {
+Vector3 Memory::GetEntityHeadPosition(uintptr_t entity) {
 	//We get the head position straight from the entity
 	return RPM<Vector3>(entity + OFFSET_ENTITY_HEAD);
 }
 
-Vector3 Memory::GetEntityNeckPosition(DWORD_PTR entity) {
+Vector3 Memory::GetEntityNeckPosition(uintptr_t entity) {
 	//We get the neck position straight from the entity
 	return RPM<Vector3>(entity + OFFSET_ENTITY_NECK);
 }
 
-Vector3 Memory::GetEntityHandPosition(DWORD_PTR entity) {
+Vector3 Memory::GetEntityHandPosition(uintptr_t entity) {
 	//We get the hand position straight from the entity
 	return RPM<Vector3>(entity + OFFSET_ENTITY_RIGHT_HAND);
 }
 
-Vector3 Memory::GetEntityChestPosition(DWORD_PTR entity) {
+Vector3 Memory::GetEntityChestPosition(uintptr_t entity) {
 	//We get the chest position straight from the entity
 	return RPM<Vector3>(entity + OFFSET_ENTITY_CHEST);
 }
 
-Vector3 Memory::GetEntityStomachPosition(DWORD_PTR entity) {
+Vector3 Memory::GetEntityStomachPosition(uintptr_t entity) {
 	//We get the stomach position straight from the entity
 	return RPM<Vector3>(entity + OFFSET_ENTITY_STOMACH);
 }
 
-Vector3 Memory::GetEntityPelvisPosition(DWORD_PTR entity) {
+Vector3 Memory::GetEntityPelvisPosition(uintptr_t entity) {
 	//We get the pelvis position straight from the entity
 	return RPM<Vector3>(entity + OFFSET_ENTITY_PELVIS);
 }
 
-PlayerInfo Memory::GetAllEntityInfo(DWORD_PTR entity) {
+PlayerInfo Memory::GetAllEntityInfo(uintptr_t entity) {
 	PlayerInfo p;
 
 	p.Health = GetEntityHealth(entity);
@@ -146,42 +146,26 @@ PlayerInfo Memory::GetAllEntityInfo(DWORD_PTR entity) {
 	return p;
 }
 
-Vector3 Memory::GetViewTranslation() {
+Memory::ViewMatrix_t Memory::GetViewMatrix() {
 	//View translation comes straight from the camera
-	return RPM<Vector3>(pCamera + OFFSET_CAMERA_VIEWTRANSLATION);
+	return RPM<ViewMatrix_t>(pCamera + OFFSET_CAMERA_VIEWRIGHT);
 }
 
-Vector3 Memory::GetViewRight() {
-	//View right comes directly from the camera
-	return RPM<Vector3>(pCamera + OFFSET_CAMERA_VIEWRIGHT);
-}
-
-Vector3 Memory::GetViewUp() {
-	//View up comes directly from the camera
-	return RPM<Vector3>(pCamera + OFFSET_CAMERA_VIEWUP);
-}
-
-Vector3 Memory::GetViewForward() {
-	//View forward comes directly from the camera
-	return RPM<Vector3>(pCamera + OFFSET_CAMERA_VIEWFORWARD);
-}
-
-float Memory::GetFOVX() {
+Vector2 Memory::GetFOV() {
 	//FOV comes directly from the camera
-	return RPM<float>(pCamera + OFFSET_CAMERA_VIEWFOVX);
-}
-
-float Memory::GetFOVY() {
-	//FOV comes directly from the camera
-	return RPM<float>(pCamera + OFFSET_CAMERA_VIEWFOVY);
+	Vector2 fov = RPM<Vector2>(pCamera + OFFSET_CAMERA_VIEWFOVX);
+	fov.x = std::abs(fov.x);
+	fov.y = std::abs(fov.y);
+	return fov;
 }
 
 Vector3 Memory::WorldToScreen(Vector3 position) {
-	Vector3 temp = position - GetViewTranslation();
+	ViewMatrix_t VM = GetViewMatrix();
+	Vector3 temp = position - VM.ViewTranslation;
 
-	float x = temp.Dot(GetViewRight());
-	float y = temp.Dot(GetViewUp());
-	float z = temp.Dot(GetViewForward() * -1);
+	float x = temp.Dot(VM.ViewRight);
+	float y = temp.Dot(VM.ViewUp);
+	float z = temp.Dot(VM.ViewForward * -1);
 
-	return Vector3((displayWidth / 2) * (1 + x / GetFOVX() / z), (displayHeight / 2) * (1 - y / GetFOVY() / z), z);
+	return Vector3((displayWidth / 2) * (1 + x / GetFOV().x / z), (displayHeight / 2) * (1 - y / GetFOV().y / z), z);
 }
