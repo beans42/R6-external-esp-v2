@@ -1,35 +1,33 @@
 #pragma once
+//Game ->
+#define ADDRESS_GAMEMANAGER 0x52B95C8
+#define ADDRESS_GAMEPROFILE 0x52A8E68
 
-// Game ->
-#define ADDRESS_GAMEMANAGER 0x52befd8
-#define ADDRESS_GAMERENDERER 0x52ae868
+//Game -> GameProfile ->
+#define GAMEPROFILE_CHAIN1 0x78
+#define GAMEPROFILE_CHAIN2 0x0
+#define GAMEPROFILE_CHAIN3 0x130
 
-// Game -> GameRenderer ->
-#define OFFSET_GAMERENDERER_DEREF 0x68
-#define OFFSET_GAMERENDERER_ENGINELINK 0x0 // Deref ->
-#define OFFSET_ENGINELINK_ENGINE 0x130 // EngineLink ->
-#define OFFSET_ENGINE_CAMERA 0x420 // Engine ->
+//Game -> GameProfile -> Camera ->
+#define OFFSET_CAMERA_VIEWRIGHT 0x1C0
+#define OFFSET_CAMERA_VIEWUP 0x1D0
+#define OFFSET_CAMERA_VIEWFORWARD 0x1E0
+#define OFFSET_CAMERA_VIEWTRANSLATION 0x1F0
+#define OFFSET_CAMERA_VIEWFOVX 0x380
+#define OFFSET_CAMERA_VIEWFOVY 0x384
 
-// Game -> GameRenderer -> Camera ->
-#define OFFSET_CAMERA_VIEWRIGHT 0x7D0
-#define OFFSET_CAMERA_VIEWUP 0x7E0
-#define OFFSET_CAMERA_VIEWFORWARD 0x7F0
-#define OFFSET_CAMERA_VIEWTRANSLATION 0x800
-#define OFFSET_CAMERA_VIEWFOVX 0x810
-#define OFFSET_CAMERA_VIEWFOVY 0x824
-
-// Game -> GameManager ->
+//Game -> GameManager ->
 #define OFFSET_GAMEMANAGER_ENTITYLIST 0x1C8
-#define OFFSET_GAMEMANAGER_ENTITY 0x8
+#define OFFSET_GAMEMANAGER_ENTITY 0x8 //Size
 
-// Game -> GameManager -> EntityList -> INDEX -> Entity ->
+//Game -> GameManager -> EntityList -> INDEX -> Entity ->
 #define OFFSET_ENTITY_ENTITYINFO 0x28
 #define OFFSET_ENTITYINFO_MAINCOMPONENT 0xD8 // EntityInfo ->
 #define OFFSET_MAINCOMPONENT_CHILDCOMPONENT 0x8 // MainComponent ->
 #define OFFSET_CHILDCOMPONENT_HEALTH_INT 0x148 // ChildComponent ->
 #define OFFSET_CHILDCOMPONENT_HEALTH_FLOAT 0x238 // ChildComponent ->
 
-// Game -> GameManager -> EntityList -> INDEX ->
+//Game -> GameManager -> EntityList -> INDEX ->
 #define OFFSET_ENTITY_REF 0x20
 #define OFFSET_ENTITY_HEAD 0x670
 #define OFFSET_ENTITY_NECK 0xF70
