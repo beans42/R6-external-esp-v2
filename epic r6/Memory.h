@@ -21,14 +21,14 @@ struct PlayerInfo {
 class Memory {
 
 private:
-	DWORD_PTR pGameManager;
-	DWORD_PTR pEntityList;
+	uintptr_t pGameManager;
+	uintptr_t pEntityList;
 
-	DWORD_PTR pRender;
-	DWORD_PTR pGameRender;
-	DWORD_PTR pEngineLink;
-	DWORD_PTR pEngine;
-	DWORD_PTR pCamera;
+	uintptr_t pRender;
+	uintptr_t pGameRender;
+	uintptr_t pEngineLink;
+	uintptr_t pEngine;
+	uintptr_t pCamera;
 
 public:
 	template <typename Type, typename Base, typename Offset>
@@ -63,8 +63,8 @@ public:
 	//False if we didn't
 	BOOL SetBaseAddress();
 
-	//Just casts base address to a DWORD_PTR
-	DWORD_PTR GetBaseAddress();
+	//Just casts base address to a uintptr_t
+	uintptr_t GetBaseAddress();
 
 	//Method we use to ReadProcessMemory
 	//Templated so we can read any type with the same function
@@ -83,65 +83,55 @@ public:
 
 	//Method to get i entity from the entity list
 	//Just doest EntityList] + i * 0x0008
-	DWORD_PTR GetEntity(int i);
-	DWORD_PTR Memory::GetEntity2(int i);
+	uintptr_t GetEntity(int i);
+	uintptr_t Memory::GetEntity2(int i);
 
 	//Method to get an entity's health
 	//Takes pointer to an entity as param
 	//Returns health value as a DWORD (120 max health for pvp cause downed state)
-	float GetEntityHealth(DWORD_PTR entity);
+	float GetEntityHealth(uintptr_t entity);
 
 	//Method to get entity's feet position
 	//Takes pointer to an entity as param
 	//Returns a Vector3 of the entity's 3D coordinates at their feet
-	Vector3 GetEntityFeetPosition(DWORD_PTR entity);
+	Vector3 GetEntityFeetPosition(uintptr_t entity);
 
 	//Method to get an entity's head position
 	//Takes pointer to an entity as param
 	//Retunrs Vector3 of the entity's 3D coordiantes at their head
-	Vector3 GetEntityHeadPosition(DWORD_PTR entity);
+	Vector3 GetEntityHeadPosition(uintptr_t entity);
 	
-	Vector3 GetEntityNeckPosition(DWORD_PTR entity);
-	Vector3 GetEntityHandPosition(DWORD_PTR entity);
-	Vector3 GetEntityChestPosition(DWORD_PTR entity);
-	Vector3 GetEntityStomachPosition(DWORD_PTR entity);
-	Vector3 GetEntityPelvisPosition(DWORD_PTR entity);
+	Vector3 GetEntityNeckPosition(uintptr_t entity);
+	Vector3 GetEntityHandPosition(uintptr_t entity);
+	Vector3 GetEntityChestPosition(uintptr_t entity);
+	Vector3 GetEntityStomachPosition(uintptr_t entity);
+	Vector3 GetEntityPelvisPosition(uintptr_t entity);
 
 	//Method that gathers all the possible info about a player
 	//Returns a PlayerInfo struct
 	//Makes life easier
 	//If you think this is a performance issues then fix it, but it really isn't
-	PlayerInfo GetAllEntityInfo(DWORD_PTR entity);
+	PlayerInfo GetAllEntityInfo(uintptr_t entity);
+
+	struct ViewMatrix_t {
+		Vector3 ViewRight;
+		UINT32 filler0;
+		Vector3 ViewUp;
+		UINT32 filler1;
+		Vector3 ViewForward;
+		UINT32 filler2;
+		Vector3 ViewTranslation;
+	};
 
 	//Method to get your view translation
 	//Returns Vector3 of the view translation
 	//Used for World2Screen stuff
-	Vector3 GetViewTranslation();
+	ViewMatrix_t GetViewMatrix();
 
-	//Method to get your view right
-	//Returns Vector3 of your view right
-	//Used for World2Screen stuff
-	Vector3 GetViewRight();
-
-	//Method to get your view up
-	//Returns Vector3 of your view up
-	//USed for Wolrd2Screen stuff
-	Vector3 GetViewUp();
-
-	//Method to get your view forward
-	//Returns Vector3 of your view forward
-	//Used for World2Screen stuff
-	Vector3 GetViewForward();
-
-	//Method to get your current FOV X
-	//Returns float of your FOV on the X axis
+	//Method to get your current FOV
+	//Returns float of your FOV on the X axis and float of your FOV on the Y axis
 	//Used for Wolrd2Screen stuff
-	float GetFOVX();
-
-	//Method to get your current FOV Y
-	//Returns float of your FOV on the Y axis
-	//Used for World2Screen stuff
-	float GetFOVY();
+	Vector2 GetFOV();
 
 	//World 2 screen function
 	//Translates 3d coordinates to 2d screen positions
