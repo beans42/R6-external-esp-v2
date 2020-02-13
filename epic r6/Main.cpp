@@ -54,7 +54,7 @@ void OpenHandle() {
 int main()
 {
 
-	std::string ConsoleNameStr = "jizzware R6 by SexOffenderSally#0660";
+	std::string ConsoleNameStr = "jizzware R6 by [REDACTED]";
 	SetConsoleTitleA(ConsoleNameStr.c_str());
 	
 	std::cout << "Do you want [S]keleton or [B]ox?" << std::endl;
